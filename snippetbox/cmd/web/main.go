@@ -17,6 +17,7 @@ type application struct {
 }
 
 func main() {
+
 	// -flag --flag -flag=x
 	// -flag x  // non-boolean flags only
 	var cfg config
@@ -33,22 +34,10 @@ func main() {
 		infoLog:  infoLog,
 	}
 
-	mux := http.NewServeMux()
-
-	// existed file: show
-	// existed folder: no show
-	fileServer := http.FileServer(neuteredFileSystem{http.Dir("./ui/static")})
-	mux.Handle("/static", http.NotFoundHandler())
-	mux.Handle("/static/", http.StripPrefix("/ui/static", fileServer))
-
-	mux.HandleFunc("/", app.home)
-	mux.HandleFunc("/snippet/view", app.snippetView)
-	mux.HandleFunc("/snippet/create", app.snippetCreate)
-
 	srv := &http.Server{
 		Addr:     cfg.addr,
 		ErrorLog: errorLog,
-		Handler:  mux,
+		Handler:  app.routes(),
 	}
 	infoLog.Printf("Start Server at %s", cfg.addr)
 	err := srv.ListenAndServe()
