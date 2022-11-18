@@ -8,8 +8,11 @@ import (
 func main() {
 	mux := http.NewServeMux()
 
-	fileServer := http.FileServer(http.Dir("./ui/static/"))
-	mux.Handle("/static/", http.StripPrefix("/static", fileServer))
+	// existed file: show
+	// existed folder: no show
+	fileServer := http.FileServer(neuteredFileSystem{http.Dir("./ui/static")})
+	mux.Handle("/static", http.NotFoundHandler())
+	mux.Handle("/static/", http.StripPrefix("/ui/static", fileServer))
 
 	mux.HandleFunc("/", home)
 	mux.HandleFunc("/snippet/view", snippetView)
